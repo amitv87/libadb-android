@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton connectAdbButton;
     private MaterialButton pairAdbButton;
     private MaterialButton runCommandButton;
+    private MaterialButton runAdbCommandButton;
     private AppCompatEditText commandInput;
     private AppCompatTextView commandOutput;
     private MainViewModel viewModel;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         connectAdbButton = findViewById(R.id.connect_adb);
         pairAdbButton = findViewById(R.id.pair_adb);
         runCommandButton = findViewById(R.id.command_run);
+        runAdbCommandButton = findViewById(R.id.command_run_adb);
         commandInput = findViewById(R.id.command_input);
         commandOutput = findViewById(R.id.command_output);
         init();
@@ -123,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
             String command = Objects.requireNonNull(commandInput.getText()).toString();
             viewModel.execute(command);
         });
+        runAdbCommandButton.setOnClickListener(v -> {
+            String command = Objects.requireNonNull(commandInput.getText()).toString();
+            viewModel.execute_adb(command);
+        });
         viewModel.watchConnectAdb().observe(this, isConnected -> {
             connected = isConnected;
             if (isConnected) {
@@ -133,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                 connectAdbButton.setText(R.string.connect_adb);
             }
             runCommandButton.setEnabled(isConnected);
+            runAdbCommandButton.setEnabled(isConnected);
         });
         viewModel.watchPairAdb().observe(this, isPaired -> {
             if (isPaired) {
@@ -143,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
         });
         viewModel.watchCommandOutput().observe(this, output ->
                 commandOutput.setText(output == null ? "" : output));
-        viewModel.autoConnect();
+        // viewModel.autoConnect();
     }
 
     public static class MainViewModel extends AndroidViewModel {
@@ -265,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                         pairingStatus = manager.pair(AndroidUtils.getHostIpAddress(getApplication()), port, pairingCode);
                     } else pairingStatus = false;
                     pairAdb.postValue(pairingStatus);
-                    autoConnectInternal();
+                    // autoConnectInternal();
                 } catch (Throwable th) {
                     th.printStackTrace();
                     pairAdb.postValue(false);
@@ -330,6 +337,29 @@ public class MainActivity extends AppCompatActivity {
                         os.flush();
                         os.write("\n".getBytes(StandardCharsets.UTF_8));
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        private void execute_adb(String command) {
+            executor.submit(() -> {
+                try {
+                    AbsAdbConnectionManager manager = AdbConnectionManager.getInstance(getApplication());
+                    AdbStream adbStream = manager.openStream(command);
+                    new Thread(()->{
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(adbStream.openInputStream()))) {
+                            StringBuilder sb = new StringBuilder();
+                            String s;
+                            while ((s = reader.readLine()) != null) {
+                                sb.append(s).append("\n");
+                                commandOutput.postValue(sb);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

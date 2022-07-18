@@ -33,13 +33,30 @@
             android:fontFamily="monospace"
             android:maxLines="1" />
 
+        <LinearLayout
+            android:weightSum="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/command_run_adb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:enabled="false"
+            android:text="@string/run_command_adb" />
+
+        <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="match_parent" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/command_run"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
             android:enabled="false"
             android:text="@string/run_command" />
+
+        </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/command_output"

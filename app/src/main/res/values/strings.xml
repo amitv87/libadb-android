@@ -1,10 +1,11 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later OR Apache-2.0 -->
 <resources>
-    <string name="app_name">ADB Shell</string>
+    <string name="app_name">ADB Tools</string>
     <string name="connect_adb">Connect ADB</string>
     <string name="pair_adb">Pair ADB</string>
     <string name="enter_command">Enter command</string>
-    <string name="run_command">Run</string>
+    <string name="run_command">Shell exec</string>
+    <string name="run_command_adb">ADB exec</string>
     <string name="pairing_successful">Pairing successful!</string>
     <string name="pairing_failed">Pairing failed!</string>
     <string name="connected_to_adb">Connected to ADB!</string>

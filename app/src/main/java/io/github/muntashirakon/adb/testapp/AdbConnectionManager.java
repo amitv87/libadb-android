@@ -121,7 +121,7 @@ public class AdbConnectionManager extends AbsAdbConnectionManager {
     @NonNull
     @Override
     protected String getDeviceName() {
-        return "MyAwesomeApp";
+        return "ADB Tools";
     }
 
     @Nullable
